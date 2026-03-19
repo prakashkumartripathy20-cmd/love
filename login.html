@@ -362,6 +362,7 @@
 
             if(input.value === expectedKey) {
                 // SUCCESS
+                sessionStorage.setItem("auth_token", "secure_session_active");
                 messageBox.innerHTML = "Authentication Confirmed. Loading dashboard...";
                 messageBox.classList.add('success');
                 

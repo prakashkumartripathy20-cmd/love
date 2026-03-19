@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script>
+        if(sessionStorage.getItem("auth_token") !== "secure_session_active") {
+            window.location.href = "login.html";
+        }
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Portal Dashboard</title>
@@ -278,6 +283,7 @@
 
         // Animate out if they want to log out
         function logout() {
+            sessionStorage.clear();
             document.body.style.transition = 'opacity 0.5s ease';
             document.body.style.opacity = '0';
             setTimeout(() => {

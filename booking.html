@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script>
+        if(sessionStorage.getItem("auth_token") !== "secure_session_active") {
+            window.location.href = "login.html";
+        }
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Booking Successful</title>
@@ -178,9 +183,12 @@
 
             const subjects = JSON.parse(subjectsRAW);
             
-            // Present Meta
-            document.getElementById('meta-info').innerHTML = 
-                `Branch: <span>${branch}</span> &nbsp;|&nbsp; Semester: <span>${sem}</span>`;
+            // Present Meta securely (XSS-safe)
+            const metaContainer = document.getElementById('meta-info');
+            metaContainer.innerHTML = 'Branch: <span></span> &nbsp;|&nbsp; Semester: <span></span>';
+            const spans = metaContainer.getElementsByTagName('span');
+            spans[0].textContent = branch;
+            spans[1].textContent = sem;
 
             // Present list
             const list = document.getElementById('subjects-list');

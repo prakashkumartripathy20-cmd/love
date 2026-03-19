@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script>
+        if(sessionStorage.getItem("auth_token") !== "secure_session_active") {
+            window.location.href = "login.html";
+        }
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Subject Selection</title>
@@ -268,11 +273,16 @@
 
         <div class="nav-links">
             <a href="registration_form.html">← Back to Profile</a>
-            <a href="login.html">Disconnect</a>
+            <a href="#" onclick="logoutUser()">Disconnect</a>
         </div>
     </div>
 
     <script>
+        function logoutUser() {
+            sessionStorage.clear();
+            window.location.href = "login.html";
+        }
+
         // Mapping real-world subjects for dynamic loading
         function getSubjectName(branch, sem, index) {
             const subjectsDictionary = {
