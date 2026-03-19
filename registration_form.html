@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Portal Dashboard</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Stunning Dark Neon Supercar from Unsplash */
+            background: #000 url('https://images.unsplash.com/photo-1544883610-63cefc56a427?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80') no-repeat center center fixed;
+            background-size: cover;
+            color: #ffffff;
+            padding: 20px;
+            /* Create a dark overlay so text remains readable over the car */
+            box-shadow: inset 0 0 0 2000px rgba(0, 0, 0, 0.45);
+        }
+
+        /* Glassmorphism Card */
+        .card {
+            background: rgba(15, 15, 20, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(0, 255, 200, 0.5);
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            z-index: 10;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.5);
+            animation: fadeIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.9);
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,59,48,0.3);
+            border-color: rgba(255,59,48,0.6);
+            color: #ffcccc;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, #00ffcc, #0088ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            flex: 1;
+            margin-bottom: 20px;
+        }
+
+        .form-row .form-group {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            color: white;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        input:focus {
+            background: rgba(0, 0, 0, 0.6);
+            border-color: #00ffcc;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
+            transform: scale(1.02);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #00ffcc 0%, #0088ff 100%);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0, 255, 204, 0.4);
+            transition: all 0.3s ease;
+            margin-top: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(0, 255, 204, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        /* Success Overlay */
+        #success-modal {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(15px);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .success-card {
+            background: rgba(10, 10, 15, 0.9);
+            border: 1px solid rgba(0, 255, 204, 0.4);
+            border-top: 3px solid #00ffcc;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            transform: scale(0.9);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        }
+
+        .success-card h2 {
+            color: #00ffcc;
+            margin-bottom: 10px;
+            font-size: 26px;
+        }
+
+        .success-card p {
+            color: #aaa;
+            margin-bottom: 25px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .success-btn {
+            background: transparent;
+            border: 1px solid #00ffcc;
+            color: #00ffcc;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .success-btn:hover {
+            background: #00ffcc;
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="card" id="form-card">
+        <div class="header">
+            <button class="logout-btn" onclick="logout()">Disconnect</button>
+            <h1>Racing Profile</h1>
+            <p>Enter your student details below.</p>
+        </div>
+
+        <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="name" placeholder="Enter your full name">
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Registration Number</label>
+                <input type="text" id="reg-no" placeholder="e.g. 2026/CS/001" style="font-family: monospace;">
+            </div>
+            
+            <div class="form-group">
+                <label>Mobile Number</label>
+                <input type="tel" id="mobile-no" placeholder="Enter 10-digit number" maxlength="10">
+            </div>
+        </div>
+
+        <button class="btn" onclick="submitProfile()">Proceed to Course Selection</button>
+    </div>
+
+    <script>
+        function submitProfile() {
+            const name = document.getElementById('name').value;
+            const regNo = document.getElementById('reg-no').value;
+            const mobile = document.getElementById('mobile-no').value;
+
+            if(!name || !regNo || !mobile) {
+                alert("Please fill in all fields (Name, Reg No, and Mobile Number).");
+                return;
+            }
+
+            // Save to localStorage to pass to the next page
+            localStorage.setItem("student_name", name);
+            localStorage.setItem("student_reg", regNo);
+            localStorage.setItem("student_mobile", mobile);
+
+            // Directly transition to subjects selection
+            document.body.style.transition = 'opacity 0.4s ease';
+            document.body.style.opacity = '0';
+            setTimeout(() => {
+                window.location.href = "subjects.html";
+            }, 400);
+        }
+
+        // Animate out if they want to log out
+        function logout() {
+            document.body.style.transition = 'opacity 0.5s ease';
+            document.body.style.opacity = '0';
+            setTimeout(() => {
+                window.location.href = "login.html";
+            }, 500);
+        }
+    </script>
+</body>
+</html>

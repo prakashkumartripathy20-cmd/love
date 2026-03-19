@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subject Selection</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Stunning Dark Neon Supercar from Unsplash */
+            background: #000 url('https://images.unsplash.com/photo-1544883610-63cefc56a427?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80') no-repeat center center fixed;
+            background-size: cover;
+            color: #ffffff;
+            padding: 20px;
+            /* Darker overlay for form readability */
+            box-shadow: inset 0 0 0 2000px rgba(0, 0, 0, 0.55);
+        }
+
+        .card {
+            background: rgba(15, 15, 20, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(0, 255, 200, 0.5);
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 550px;
+            z-index: 10;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.5);
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            background: linear-gradient(90deg, #00ffcc, #0088ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            color: #eee;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        select {
+            width: 100%;
+            padding: 14px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s ease;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        select option {
+            background: #111;
+            color: white;
+        }
+
+        select:focus {
+            border-color: #00ffcc;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
+        }
+
+        /* Subjects Section */
+        #subjects-container {
+            display: none;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            animation: popIn 0.4s ease-out;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        #subjects-container h3 {
+            font-size: 16px;
+            color: #00ffcc;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 8px;
+        }
+
+        .subject-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            background: rgba(255,255,255,0.05);
+            padding: 12px 15px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .subject-item:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateX(5px);
+            border-left: 3px solid #00ffcc;
+        }
+
+        .subject-item input[type="checkbox"] {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            accent-color: #00ffcc;
+            cursor: pointer;
+        }
+
+        .subject-item label {
+            margin-bottom: 0;
+            color: #fff;
+            font-size: 15px;
+            cursor: pointer;
+            text-transform: none;
+            letter-spacing: 0;
+            font-weight: 400;
+            flex: 1;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #00ffcc 0%, #0088ff 100%);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0, 255, 204, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(0, 255, 204, 0.5);
+        }
+
+        .btn:disabled {
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.3);
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* Nav links */
+        .nav-links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+            font-size: 14px;
+        }
+
+        .nav-links a {
+            color: #00ffcc;
+            text-decoration: none;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+            font-weight: 600;
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="header">
+            <h1>Course Selection</h1>
+            <p>Select your branch and semester to construct sub-pages.</p>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Branch Focus</label>
+                <select id="branch" onchange="loadSubjects()">
+                    <option value="" disabled selected>Select Branch</option>
+                    <option value="Computer Science">Computer Science</option>
+                    <option value="Electrical">Electrical</option>
+                    <option value="Mechanical">Mechanical</option>
+                    <option value="Civil">Civil</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Semester</label>
+                <select id="semester" onchange="loadSubjects()">
+                    <option value="" disabled selected>Select Sem</option>
+                    <option value="1">Semester 1</option>
+                    <option value="2">Semester 2</option>
+                    <option value="3">Semester 3</option>
+                    <option value="4">Semester 4</option>
+                    <option value="5">Semester 5</option>
+                    <option value="6">Semester 6</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="subjects-container">
+            <h3>Available Subjects (Tick Applicable)</h3>
+            <div id="subjects-list">
+                <!-- Checkboxes populated via JS dynamically -->
+            </div>
+        </div>
+
+        <button class="btn" id="save-btn" onclick="saveSelection()" disabled>Confirm Subject Booking</button>
+
+        <div class="nav-links">
+            <a href="registration_form.html">← Back to Profile</a>
+            <a href="login.html">Disconnect</a>
+        </div>
+    </div>
+
+    <script>
+        // Mapping real-world subjects for dynamic loading
+        function getSubjectName(branch, sem, index) {
+            const subjectsDictionary = {
+                "Computer Science": ["Data Structures", "Design of Algorithms", "Operating Systems", "Computer Networks", "Database Management Systems"],
+                "Electrical": ["Circuit Theory", "Digital Electronics", "Power Systems", "Control Systems", "Microprocessors"],
+                "Mechanical": ["Thermodynamics", "Fluid Mechanics", "Machine Design", "Heat Transfer", "Manufacturing Technology"],
+                "Civil": ["Structural Analysis", "Surveying Principles", "Soil Mechanics", "Concrete Technology", "Transportation Engineering"]
+            };
+            
+            let baseName = subjectsDictionary[branch][index - 1];
+            // Format example: Data Structures (Sem 3)
+            return `${baseName} (Semester ${sem})`;
+        }
+
+        function loadSubjects() {
+            const branch = document.getElementById('branch').value;
+            const sem = document.getElementById('semester').value;
+            const container = document.getElementById('subjects-container');
+            const list = document.getElementById('subjects-list');
+            const btn = document.getElementById('save-btn');
+
+            if (branch && sem) {
+                // Clear the old list before dropping in new ones
+                list.innerHTML = '';
+                
+                // Construct exactly 5 checkboxes as requested by the user
+                for (let i = 1; i <= 5; i++) {
+                    const subjectName = getSubjectName(branch, sem, i);
+                    
+                    const div = document.createElement('div');
+                    div.className = 'subject-item';
+                    
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.id = 'sub' + i;
+                    checkbox.name = 'subjects';
+                    checkbox.value = subjectName;
+                    
+                    const label = document.createElement('label');
+                    label.htmlFor = 'sub' + i;
+                    label.innerText = subjectName;
+
+                    // Clicking the invisible container also ticks the checkbox for awesome UX
+                    div.onclick = function(e) {
+                        if(e.target !== checkbox) {
+                            checkbox.checked = !checkbox.checked;
+                        }
+                    };
+
+                    div.appendChild(checkbox);
+                    div.appendChild(label);
+                    list.appendChild(div);
+                }
+
+                // Show the container box with animation
+                container.style.display = 'block';
+                btn.disabled = false;
+            } else {
+                container.style.display = 'none';
+                btn.disabled = true;
+            }
+        }
+
+        function saveSelection() {
+            const checkboxes = document.querySelectorAll('input[name="subjects"]:checked');
+            const branch = document.getElementById('branch').value;
+            const sem = document.getElementById('semester').value;
+            
+            if(checkboxes.length === 0) {
+                alert("Attention Driver: Please tick at least one subject to book.");
+                return;
+            }
+
+            let selected = [];
+            checkboxes.forEach((cb) => {
+                selected.push(cb.value);
+            });
+
+            // Save booking details to local storage to pass to booking.html
+            localStorage.setItem("booked_branch", branch);
+            localStorage.setItem("booked_sem", sem);
+            localStorage.setItem("booked_subjects", JSON.stringify(selected));
+
+            // Grab profile data
+            const name = localStorage.getItem("student_name") || "Unknown";
+            const reg = localStorage.getItem("student_reg") || "Unknown";
+            const mobile = localStorage.getItem("student_mobile") || "Unknown";
+            
+            // Since your Google script only expects the 5 original fields, we combine the Subjects into the Branch column so no script update is needed!
+            const payload = JSON.stringify({
+                name: name,
+                regNumber: reg,
+                contact: mobile, // Must be named 'contact' to match your old script
+                branch: branch + " | Subjects: " + selected.join(", "),
+                semester: sem
+            });
+
+            const btn = document.getElementById('save-btn');
+            const oldText = btn.innerText;
+            btn.innerText = "Syncing to Database...";
+            btn.disabled = true;
+
+            const scriptURL = "https://script.google.com/macros/s/AKfycbzForgwLWTHmectC3AKhmShISORL-eX88goMfbO8-grteMDXOCTVUXQGm2CeBuVWdN5/exec";
+
+            fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain' },
+                body: payload
+            }).then(response => {
+                // Redirect to booking page on success
+                window.location.href = "booking.html";
+            }).catch(err => {
+                btn.innerText = oldText;
+                btn.disabled = false;
+                alert("Network Error saving to database!");
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Successful</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000 url('https://images.unsplash.com/photo-1544883610-63cefc56a427?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80') no-repeat center center fixed;
+            background-size: cover;
+            color: #ffffff;
+            padding: 20px;
+            box-shadow: inset 0 0 0 2000px rgba(0, 0, 0, 0.65);
+        }
+
+        .card {
+            background: rgba(10, 15, 10, 0.75);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            border-top: 3px solid #00ffcc;
+            border-radius: 20px;
+            padding: 50px 40px;
+            width: 100%;
+            max-width: 550px;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0, 255, 204, 0.15);
+            animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .icon-box {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(0, 255, 204, 0.1);
+            color: #00ffcc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin: 0 auto 20px auto;
+            border: 2px solid #00ffcc;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.4);
+            animation: pulseIcon 2s infinite alternate ease-in-out;
+        }
+
+        @keyframes pulseIcon {
+            0% { transform: scale(0.95); box-shadow: 0 0 10px rgba(0, 255, 204, 0.2); }
+            100% { transform: scale(1.05); box-shadow: 0 0 30px rgba(0, 255, 204, 0.6); }
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+
+        h2 {
+            font-size: 18px;
+            color: #00ffcc;
+            font-weight: 600;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .details-box {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: left;
+            margin-bottom: 30px;
+        }
+
+        .meta {
+            color: #aaaaaa;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
+        }
+
+        .meta span {
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        #subjects-list {
+            list-style: none;
+        }
+
+        #subjects-list li {
+            font-size: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        #subjects-list li::before {
+            content: '✔';
+            color: #00ffcc;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #00ffcc 0%, #0088ff 100%);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0, 255, 204, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(0, 255, 204, 0.5);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="icon-box">✓</div>
+        <h1>Booking Successful!</h1>
+        <h2>Course Logistics Confirmed</h2>
+
+        <div class="details-box">
+            <div class="meta" id="meta-info">
+                Loading Details...
+            </div>
+            <ul id="subjects-list">
+                <!-- Javascript injects subjects here -->
+            </ul>
+        </div>
+
+        <button class="btn" onclick="window.location.href='registration_form.html'">Return to Dashboard</button>
+    </div>
+
+    <script>
+        window.onload = function() {
+            const branch = localStorage.getItem("booked_branch");
+            const sem = localStorage.getItem("booked_sem");
+            const subjectsRAW = localStorage.getItem("booked_subjects");
+
+            if(!branch || !subjectsRAW) {
+                document.getElementById('meta-info').innerHTML = "No recent booking data found.";
+                return;
+            }
+
+            const subjects = JSON.parse(subjectsRAW);
+            
+            // Present Meta
+            document.getElementById('meta-info').innerHTML = 
+                `Branch: <span>${branch}</span> &nbsp;|&nbsp; Semester: <span>${sem}</span>`;
+
+            // Present list
+            const list = document.getElementById('subjects-list');
+            list.innerHTML = '';
+            
+            subjects.forEach(sub => {
+                const li = document.createElement('li');
+                li.innerText = sub;
+                list.appendChild(li);
+            });
+        }
+    </script>
+</body>
+</html>
