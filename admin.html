@@ -234,14 +234,14 @@
     </div>
 
     <script>
-        // HARDCODED ADMIN MOCK NUMBER (You can change this)
-        const ADMIN_NUMBER = "6370000001"; 
+        // OBFUSCATED ADMIN MOCK NUMBER (Base64)
+        const ADMIN_HASH = "NjM3MDAwMDAwMQ=="; 
 
         function verifyAdmin() {
             const phone = document.getElementById('admin-phone').value;
             const msg = document.getElementById('login-msg');
 
-            if(phone === ADMIN_NUMBER) {
+            if(btoa(phone) === ADMIN_HASH) {
                 // Success
                 document.getElementById('login-view').style.display = 'none';
                 
