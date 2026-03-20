@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <script>
-        if(sessionStorage.getItem("auth_token") !== "secure_session_active") {
+        // Verify secure session
+        if(!sessionStorage.getItem("auth_token")) {
             window.location.href = "login.html";
         }
     </script>
@@ -325,12 +326,7 @@
                     label.htmlFor = 'sub' + i;
                     label.innerText = subjectName;
 
-                    // Clicking the invisible container also ticks the checkbox for awesome UX
-                    div.onclick = function(e) {
-                        if(e.target !== checkbox) {
-                            checkbox.checked = !checkbox.checked;
-                        }
-                    };
+                    // Ticking is handled naturally by the checkbox and its label
 
                     div.appendChild(checkbox);
                     div.appendChild(label);
@@ -371,34 +367,41 @@
             const reg = localStorage.getItem("student_reg") || "Unknown";
             const mobile = localStorage.getItem("student_mobile") || "Unknown";
             
-            // Since your Google script only expects the 5 original fields, we combine the Subjects into the Branch column so no script update is needed!
             const payload = JSON.stringify({
                 name: name,
                 regNumber: reg,
-                contact: mobile, // Must be named 'contact' to match your old script
-                branch: branch + " | Subjects: " + selected.join(", "),
-                semester: sem
+                contact: mobile,
+                branch: branch,
+                semester: sem,
+                subjects: selected // Sending as array, backend will join with commas
             });
 
             const btn = document.getElementById('save-btn');
             const oldText = btn.innerText;
-            btn.innerText = "Syncing to Database...";
+            btn.innerText = "Syncing to Internal Database...";
             btn.disabled = true;
 
-            const scriptURL = "https://script.google.com/macros/s/AKfycbzForgwLWTHmectC3AKhmShISORL-eX88goMfbO8-grteMDXOCTVUXQGm2CeBuVWdN5/exec";
-
-            fetch(scriptURL, {
+            // Transmitting payload securely to backend Server
+            fetch('/api/book-subjects', {
                 method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'text/plain' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + sessionStorage.getItem('auth_token')
+                },
                 body: payload
-            }).then(response => {
-                // Redirect to booking page on success
-                window.location.href = "booking.html";
+            }).then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    window.location.href = "booking.html";
+                } else {
+                    btn.innerText = oldText;
+                    btn.disabled = false;
+                    alert("Submission Rejected: " + data.error);
+                }
             }).catch(err => {
                 btn.innerText = oldText;
                 btn.disabled = false;
-                alert("Network Error saving to database!");
+                alert("Network Error saving to secure database!");
             });
         }
     </script>

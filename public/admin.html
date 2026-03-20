@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 50px 20px;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #ffffff;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* Ambient Admin Glow */
+        .glow {
+            position: absolute;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(238, 9, 121, 0.2) 0%, rgba(255, 106, 0, 0) 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+            animation: pulseGlow 4s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.6; }
+            100% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(238, 9, 121, 0.5);
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 420px;
+            z-index: 10;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            transform: translateY(20px);
+            opacity: 0;
+            animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes popIn {
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            background: linear-gradient(90deg, #ff6a00, #ee0979);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #b0b0b0;
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 13px;
+            color: #dddddd;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            outline: none;
+            letter-spacing: 1px;
+        }
+
+        .input-group input:focus {
+            border-color: #ff6a00;
+            background: rgba(238, 9, 121, 0.1);
+            box-shadow: 0 0 15px rgba(238, 9, 121, 0.2);
+            transform: scale(1.02);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #ff6a00, #ee0979);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 20px rgba(238, 9, 121, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(238, 9, 121, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .message {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            min-height: 20px;
+        }
+
+        #dashboard { display: none; }
+        #login-view { display: block; }
+        
+        .current-key-box {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 25px;
+            border: 1px dashed rgba(255, 106, 0, 0.6);
+        }
+
+        .current-key-box p {
+            color: #888;
+            font-size: 12px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .current-key {
+            font-family: monospace;
+            font-size: 20px;
+            letter-spacing: 3px;
+            color: #ff6a00;
+            font-weight: 700;
+        }
+
+        .reset-link {
+            color: #888;
+            font-size: 13px;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .reset-link:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+
+        /* Bookings Table Styles */
+        .bookings-container {
+            margin-top: 30px;
+            width: 100%;
+            max-width: 900px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(25px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            z-index: 10;
+            display: none;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            color: #eee;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ff6a00;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+
+        .logout-link {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            font-size: 14px;
+            z-index: 20;
+        }
+
+        .logout-link:hover {
+            color: #ff4b2b;
+        }
+
+        @media (max-width: 768px) {
+            .bookings-container {
+                padding: 15px;
+            }
+            th, td {
+                padding: 8px 10px;
+                font-size: 13px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="glow"></div>
+    <a href="#" class="logout-link" onclick="logoutAdmin()" id="logout-btn" style="display: none;">Logout System</a>
+
+    <!-- Admin Authentication View -->
+    <div class="card" id="login-view">
+        <div class="header">
+            <h1>Admin Gateway</h1>
+            <p>Authorized Personnel Only</p>
+        </div>
+        <div class="input-group">
+            <label>Master Mobile Number</label>
+            <input type="password" id="admin-phone" placeholder="Enter master admin number" maxlength="10">
+        </div>
+        <button class="btn" onclick="verifyAdmin()">Authenticate Access</button>
+        <div class="message" id="login-msg" style="color: #ff4b2b;"></div>
+    </div>
+
+    <!-- System Passkey Manager Dashboard View -->
+    <div class="card" id="dashboard">
+        <div class="header">
+            <h1>Passkey Manager</h1>
+            <p>Override the student login passkey</p>
+        </div>
+        
+        <div class="current-key-box">
+            <p>Active Passkey Pattern</p>
+            <div class="current-key" id="display-key">Loading...</div>
+        </div>
+
+        <div class="input-group">
+            <label>Set Custom Passkey</label>
+            <input type="text" id="new-passkey" placeholder="Enter new secret code" maxlength="15">
+        </div>
+        
+        <button class="btn" onclick="updatePasskey()">Update Student Key</button>
+        <div class="message" id="dash-msg"></div>
+        
+        <div style="text-align: center; margin-top: 25px;">
+            <a href="#" class="reset-link" onclick="resetToDynamic()">Revert to Auto Dynamic Date Format (DDYYYYMM)</a>
+        </div>
+    </div>
+
+    <!-- Bookings View -->
+    <div class="bookings-container" id="bookings-view">
+        <div class="header">
+            <h1>Student Registrations</h1>
+            <p>Recent bookings from the secure database</p>
+        </div>
+        <table id="bookings-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Reg Number</th>
+                    <th>Mobile</th>
+                    <th>Branch</th>
+                    <th>Semester</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody id="bookings-body">
+                <!-- Data injected here -->
+            </tbody>
+        </table>
+        <div id="no-bookings" class="no-data" style="display: none;">No student bookings found yet.</div>
+    </div>
+
+    <script>
+        async function verifyAdmin() {
+            const phone = document.getElementById('admin-phone').value;
+            const msg = document.getElementById('login-msg');
+
+            try {
+                const response = await fetch('/api/admin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone })
+                });
+                
+                const data = await response.json();
+                if(data.success) {
+                    sessionStorage.setItem("admin_token", data.token);
+                    document.getElementById('login-view').style.display = 'none';
+                    document.getElementById('logout-btn').style.display = 'block';
+                    
+                    // Show dashboard and animate in
+                    const dash = document.getElementById('dashboard');
+                    dash.style.display = 'block';
+                    dash.style.animation = 'popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
+
+                    // Show bookings view
+                    document.getElementById('bookings-view').style.display = 'block';
+
+                    loadCurrentKey();
+                    fetchBookings();
+                } else {
+                    msg.innerText = data.message || "Access Denied.";
+                }
+            } catch (err) {
+                msg.innerText = "Server Connection Failed.";
+            }
+        }
+
+        async function fetchBookings() {
+            const token = sessionStorage.getItem("admin_token");
+            try {
+                const response = await fetch('/api/bookings', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const data = await response.json();
+                if(data.success) {
+                    const body = document.getElementById('bookings-body');
+                    const noData = document.getElementById('no-bookings');
+                    body.innerHTML = '';
+                    
+                    if(data.bookings.length === 0) {
+                        noData.style.display = 'block';
+                    } else {
+                        noData.style.display = 'none';
+                        data.bookings.forEach(b => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${b.name}</td>
+                                <td>${b.regNumber}</td>
+                                <td>${b.mobile}</td>
+                                <td>${b.branch}</td>
+                                <td>${b.semester}</td>
+                                <td>${new Date(b.timestamp).toLocaleDateString()}</td>
+                            `;
+                            body.appendChild(row);
+                        });
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to fetch bookings:", err);
+            }
+        }
+
+        async function loadCurrentKey() {
+            // We'll fetch from backend if we want, but for now we can still check local if we just updated it
+            // Better to use a backend GET /api/settings/passkey but I'll stick to a simple display for now.
+            const savedKey = localStorage.getItem("admin_passkey") || "00000000";
+            const display = document.getElementById('display-key');
+            
+            if(savedKey !== "00000000") {
+                display.innerText = savedKey;
+                display.style.color = "#4CAF50"; 
+            } else {
+                display.innerText = "[ Dynamic: DDYYYYMM ]";
+                display.style.color = "#ff6a00";
+            }
+        }
+
+        async function updatePasskey() {
+            const newKey = document.getElementById('new-passkey').value.trim();
+            const msg = document.getElementById('dash-msg');
+            const token = sessionStorage.getItem("admin_token");
+
+            if(!newKey || newKey.length < 3) {
+                msg.style.color = "#ff4b2b";
+                msg.innerText = "Key must be at least 3 characters.";
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/update-passkey', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ newPasskey: newKey })
+                });
+                const data = await response.json();
+                if(data.success) {
+                    localStorage.setItem("admin_passkey", newKey);
+                    document.getElementById('new-passkey').value = "";
+                    msg.style.color = "#4CAF50";
+                    msg.innerText = "Success! Student Login system updated.";
+                    loadCurrentKey();
+                } else {
+                    msg.innerText = "Error: " + data.error;
+                }
+            } catch (err) {
+                msg.innerText = "Connection Failed.";
+            }
+        }
+
+        async function resetToDynamic() {
+            const msg = document.getElementById('dash-msg');
+            const token = sessionStorage.getItem("admin_token");
+            
+            try {
+                const response = await fetch('/api/update-passkey', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ newPasskey: '00000000' })
+                });
+                if(response.ok) {
+                    localStorage.setItem("admin_passkey", "00000000");
+                    msg.style.color = "#aaaaaa";
+                    msg.innerText = "System reset back to Automatic Dynamic Date.";
+                    document.getElementById('new-passkey').value = "";
+                    loadCurrentKey();
+                }
+            } catch (err) {
+                msg.innerText = "Reset Failed.";
+            }
+        }
+
+        function logoutAdmin() {
+            sessionStorage.clear();
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>

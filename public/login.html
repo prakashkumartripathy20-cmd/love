@@ -337,15 +337,11 @@
             }
         }
 
-        function verifyLogin() {
+        async function verifyLogin() {
             const input = document.getElementById('passkey');
             const messageBox = document.getElementById('status-message');
             const card = document.getElementById('loginCard');
             
-            // Sync with Admin logic Custom Passkey in LocalStorage
-            const storedAdminKey = localStorage.getItem("admin_passkey") || "00000000";
-            const expectedKey = storedAdminKey === "00000000" ? getDynamicPasskey() : storedAdminKey;
-
             // Reset visual states
             messageBox.className = 'message-box';
             card.style.animation = 'none';
@@ -353,45 +349,54 @@
             if(!input.value) {
                 messageBox.innerHTML = "Access Denied: Passkey is required.";
                 messageBox.classList.add('error');
-                
-                // Trigger shake animation using tiny timeout
                 setTimeout(() => { card.style.animation = 'shake 0.4s ease-in-out'; }, 10);
                 input.focus();
                 return;
             }
 
-            if(input.value === expectedKey) {
-                // SUCCESS
-                sessionStorage.setItem("auth_token", "secure_session_active");
-                messageBox.innerHTML = "Authentication Confirmed. Loading dashboard...";
-                messageBox.classList.add('success');
+            try {
+                // Request validation from the Secure Backend
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ passkey: input.value })
+                });
                 
-                // Beautiful success confirmation animation
-                card.style.transform = 'scale(1.03)';
-                card.style.boxShadow = '0 0 60px rgba(76, 175, 80, 0.4)';
-                card.style.border = '1px solid rgba(76, 175, 80, 0.8)';
-                card.style.transition = 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-                
-                input.disabled = true;
-                const btn = document.querySelector('.login-btn');
-                btn.disabled = true;
-                btn.innerHTML = "Connecting...";
+                const data = await response.json();
 
-                // Redirect simulation to registration form page
-                setTimeout(() => {
-                    window.location.href = "registration_form.html";
-                }, 1500);
+                if(data.success) {
+                    // SUCCESS - Save real server token
+                    sessionStorage.setItem("auth_token", data.token);
+                    
+                    messageBox.innerHTML = "Authentication Confirmed. Loading dashboard...";
+                    messageBox.classList.add('success');
+                    
+                    // Beautiful success confirmation animation
+                    card.style.transform = 'scale(1.03)';
+                    card.style.boxShadow = '0 0 60px rgba(76, 175, 80, 0.4)';
+                    card.style.border = '1px solid rgba(76, 175, 80, 0.8)';
+                    card.style.transition = 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                    
+                    input.disabled = true;
+                    const btn = document.querySelector('.login-btn');
+                    btn.disabled = true;
+                    btn.innerHTML = "Connecting...";
 
-            } else {
-                // FAILURE
-                messageBox.innerHTML = "Invalid Passkey Signature!";
+                    setTimeout(() => {
+                        window.location.href = "registration_form.html";
+                    }, 1500);
+
+                } else {
+                    // FAILURE
+                    messageBox.innerHTML = data.message;
+                    messageBox.classList.add('error');
+                    setTimeout(() => { card.style.animation = 'shake 0.4s ease-in-out'; }, 10);
+                    input.value = "";
+                    input.focus();
+                }
+            } catch (err) {
+                messageBox.innerHTML = "Server Connection Failed!";
                 messageBox.classList.add('error');
-                
-                // Trigger shake
-                setTimeout(() => { card.style.animation = 'shake 0.4s ease-in-out'; }, 10);
-                
-                input.value = "";
-                input.focus();
             }
         }
     </script>

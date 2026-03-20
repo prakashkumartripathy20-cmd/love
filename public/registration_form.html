@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <script>
-        if(sessionStorage.getItem("auth_token") !== "secure_session_active") {
+        // Verify secure session
+        if(!sessionStorage.getItem("auth_token")) {
             window.location.href = "login.html";
         }
     </script>
